@@ -13,19 +13,25 @@ class LetterListViewModel {
     var searchText: String = ""
     
     var filteredLetters: [Letter] {
-        return letters
+        return letters.sorted(by: { $0.timestamp > $1.timestamp} )
     }
     
     init() {
-        loadSampleLetters()
+        letters = MockData.letters
     }
     
-    func loadSampleLetters() {
-        letters = [
-            Letter(title: "Welcome!", content: "This is your first letter in Letterlogue.", timestamp: Date().addingTimeInterval(-86400 * 2)),
-            Letter(title: "Shopping List", content: "Milk, Bread, Eggs", timestamp: Date().addingTimeInterval(-86400)),
-            Letter(title: "Ideas for Project X", content: "Brainstorming session notes...", timestamp: Date())
-        ]
+    func addLetter(_ letter: Letter) {
+        letters.append(letter)
+    }
+    
+    func updateLetter(_ letter: Letter) {
+        if let index = letters.firstIndex(where: { $0.id == letter.id }) {
+            letters[index] = letter
+        }
+    }
+    
+    func deleteLetter(index: IndexSet) {
+        letters.remove(atOffsets: index)
     }
 }
 

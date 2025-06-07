@@ -9,29 +9,41 @@ import SwiftUI
 
 struct LetterListView: View {
     
-    @State var viewModel = LetterListViewModel()
+    @State var listViewModel = LetterListViewModel()
+    @State private var showingAddLetterSheet = false
     
     var body: some View {
-        NavigationStack {
+        NavigationStack{
             List {
-                ForEach(viewModel.filteredLetters) { letter in
+                ForEach(listViewModel.filteredLetters) { letter in
                     NavigationLink {
-                        LetterDetailView(letter: letter)
+                        LetterDetailView(
+                            listViewModel: listViewModel,
+                            detailViewModel: LetterDetailViewModel(letter: letter)
+                        )
                     } label: {
                         LetterRow(letter: letter)
                     }
+                    
                 }
+                .onDelete(perform: listViewModel.deleteLetter)
             }
+            .listStyle(.plain)
             .navigationTitle("All letters")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        print()
+                        showingAddLetterSheet = true
                     } label: {
                         Image(systemName: "plus.circle.fill")
                     }
-
                 }
+            }
+            .sheet(isPresented: $showingAddLetterSheet) {
+                LetterDetailView(
+                    listViewModel: listViewModel,
+                    detailViewModel: LetterDetailViewModel()
+                )
             }
         }
     }
@@ -41,10 +53,4 @@ struct LetterListView: View {
     LetterListView()
 }
 
-struct LetterRow: View {
-    var letter: Letter
-    
-    var body: some View {
-        Text(letter.title)
-    }
-}
+
