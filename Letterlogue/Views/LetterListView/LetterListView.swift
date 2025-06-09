@@ -28,6 +28,7 @@ struct LetterListView: View {
             }
             .listStyle(.plain)
             .navigationTitle("All letters")
+            .searchable(text: $listViewModel.searchText)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink {

@@ -13,7 +13,17 @@ class LetterListViewModel {
     var searchText: String = ""
     
     var filteredLetters: [Letter] {
-        return letters.sorted(by: { $0.timestamp > $1.timestamp} )
+        let sortedLetters = letters.sorted(by: { $0.timestamp > $1.timestamp })
+
+        if searchText.isEmpty {
+            return sortedLetters
+        } else {
+            return sortedLetters.filter { letter in
+                let titleMatch =  letter.title.localizedCaseInsensitiveContains(searchText)
+                let contentMatch = letter.content.localizedCaseInsensitiveContains(searchText)
+               return titleMatch || contentMatch
+            }
+        }
     }
     
     init() {
