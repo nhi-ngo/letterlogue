@@ -8,42 +8,46 @@
 import SwiftUI
 
 struct LetterDetailView: View {
+    private enum Field: Hashable {
+        case title
+        case content
+    }
     
     var listViewModel: LetterListViewModel
-    @State var detailViewModel = LetterDetailViewModel()
+    @State var detailViewModel = LetterDetailViewModel() 
     
-    @Environment(\.dismiss) var dismiss
+    @FocusState private var focusedField: Field?
     
     var body: some View {
-        NavigationStack {
-            VStack {
-                TextField("Title", text: $detailViewModel.title)
-                    .font(.title2)
-                    .padding()
-                
-                TextEditor(text: $detailViewModel.content)
-                    .frame(maxHeight: .infinity)
-                    .border(Color.gray.opacity(0.2), width: 1)
-                    .padding(.horizontal)
-                
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
+        VStack {
+            TextField("Title", text: $detailViewModel.title)
+                .font(.title2)
+                .padding()
+                .focused($focusedField, equals: .title)
+            
+            TextEditor(text: $detailViewModel.content)
+                .frame(maxHeight: .infinity)
+                .border(Color.gray.opacity(0.2), width: 1)
+                .padding(.horizontal)
+                .focused($focusedField, equals: .content)
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Done") {
+                    focusedField = nil
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
-                        let savedLetter = detailViewModel.saveLetter()
-                        if detailViewModel.isNew {
-                            listViewModel.addLetter(savedLetter)
-                        } else {
-                            listViewModel.updateLetter(savedLetter)
-                        }
-                        dismiss()
-                    }
-                    .disabled(detailViewModel.content.isEmpty && detailViewModel.title.isEmpty)
+            }
+        }
+        .onDisappear {
+            if detailViewModel.isNew {
+                if !detailViewModel.title.isEmpty || !detailViewModel.content.isEmpty {
+                    let letterToSave = detailViewModel.saveLetter()
+                    listViewModel.addLetter(letterToSave)
+                }
+            } else {
+                if detailViewModel.hasChanges {
+                    let letterToSave = detailViewModel.saveLetter()
+                    listViewModel.updateLetter(letterToSave)
                 }
             }
         }

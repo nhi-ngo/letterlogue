@@ -30,8 +30,12 @@ class LetterListViewModel {
         }
     }
     
-    func deleteLetter(index: IndexSet) {
-        letters.remove(atOffsets: index)
+    func deleteLetter(atOffsets offsets: IndexSet) {
+        let idsToDelete = offsets.map { filteredLetters[$0].id }
+        
+        letters.removeAll { letterInOriginal in
+            idsToDelete.contains(letterInOriginal.id)
+        }
     }
 }
 

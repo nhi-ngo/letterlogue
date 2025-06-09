@@ -10,10 +10,9 @@ import SwiftUI
 struct LetterListView: View {
     
     @State var listViewModel = LetterListViewModel()
-    @State private var showingAddLetterSheet = false
     
     var body: some View {
-        NavigationStack{
+        NavigationStack {
             List {
                 ForEach(listViewModel.filteredLetters) { letter in
                     NavigationLink {
@@ -24,26 +23,22 @@ struct LetterListView: View {
                     } label: {
                         LetterRow(letter: letter)
                     }
-                    
                 }
                 .onDelete(perform: listViewModel.deleteLetter)
             }
             .listStyle(.plain)
             .navigationTitle("All letters")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showingAddLetterSheet = true
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink {
+                        LetterDetailView(
+                            listViewModel: listViewModel,
+                            detailViewModel: LetterDetailViewModel()
+                        )
                     } label: {
                         Image(systemName: "plus.circle.fill")
                     }
                 }
-            }
-            .sheet(isPresented: $showingAddLetterSheet) {
-                LetterDetailView(
-                    listViewModel: listViewModel,
-                    detailViewModel: LetterDetailViewModel()
-                )
             }
         }
     }

@@ -16,6 +16,14 @@ class LetterDetailViewModel {
     private var originalLetter: Letter?
     var isNew: Bool { originalLetter == nil }
     
+    var hasChanges: Bool {
+        if let original = originalLetter {
+            return title != original.title || content != original.content
+        }
+        return false
+    }
+    
+    // For new letter
     init() {
         self.letter = Letter(content: "")
         self.title = ""
@@ -23,11 +31,12 @@ class LetterDetailViewModel {
         self.originalLetter = nil
     }
     
+    // For editing existing letter
     init(letter: Letter) {
+        self.originalLetter = letter
         self.letter = letter
         self.title = letter.title
         self.content = letter.content
-        self.originalLetter = letter
     }
     
     func saveLetter() -> Letter {
@@ -40,7 +49,7 @@ class LetterDetailViewModel {
         
         letterToSave.title = self.title
         letterToSave.content = self.content
-        letterToSave.timestamp = Date() 
+        letterToSave.timestamp = Date()
         
         return letterToSave
     }
