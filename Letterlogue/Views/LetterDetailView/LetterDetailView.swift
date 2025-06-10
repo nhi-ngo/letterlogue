@@ -14,7 +14,7 @@ struct LetterDetailView: View {
     }
     
     var listViewModel: LetterListViewModel
-    @State var detailViewModel = LetterDetailViewModel() 
+    @State var detailViewModel = LetterDetailViewModel()
     
     @FocusState private var focusedField: Field?
     
@@ -22,15 +22,14 @@ struct LetterDetailView: View {
         VStack {
             TextField("Title", text: $detailViewModel.title)
                 .font(.title2)
-                .padding()
                 .focused($focusedField, equals: .title)
             
             TextEditor(text: $detailViewModel.content)
                 .frame(maxHeight: .infinity)
                 .border(Color.gray.opacity(0.2), width: 1)
-                .padding(.horizontal)
                 .focused($focusedField, equals: .content)
         }
+        .padding()
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Done") {

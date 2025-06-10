@@ -14,19 +14,21 @@ struct LetterListView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(listViewModel.filteredLetters) { letter in
-                    NavigationLink {
-                        LetterDetailView(
-                            listViewModel: listViewModel,
-                            detailViewModel: LetterDetailViewModel(letter: letter)
-                        )
-                    } label: {
-                        LetterRow(letter: letter)
-                    }
+                if !listViewModel.pinnedLetters.isEmpty {
+                    PinnedLettersSection(listViewModel: listViewModel)
                 }
-                .onDelete(perform: listViewModel.deleteLetter)
+                
+                if !listViewModel.unpinnedLetters.isEmpty {
+                    UnpinnedLettersSection(listViewModel: listViewModel)
+                }
+                
+                if listViewModel.pinnedLetters.isEmpty && listViewModel.unpinnedLetters.isEmpty {
+                    Text("No letters yet. Tap '+' to create one!")
+                        .foregroundColor(.gray)
+                        .padding()
+                }
             }
-            .listStyle(.plain)
+            .listStyle(.insetGrouped)
             .navigationTitle("All letters")
             .searchable(text: $listViewModel.searchText)
             .toolbar {
@@ -50,3 +52,66 @@ struct LetterListView: View {
 }
 
 
+struct PinnedLettersSection: View {
+    var listViewModel: LetterListViewModel
+    
+    var body: some View {
+        Section {
+            ForEach(listViewModel.pinnedLetters) { letter in
+                NavigationLink {
+                    LetterDetailView(
+                        listViewModel: listViewModel,
+                        detailViewModel: LetterDetailViewModel(letter: letter)
+                    )
+                } label: {
+                    LetterRow(letter: letter)
+                }
+                .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                    Button {
+                        listViewModel.togglePin(for: letter)
+                    } label: {
+                        Label("Unpin", systemImage: "pin.slash.fill")
+                    }
+                    .tint(.gray)
+                }
+            }
+            .onDelete { offsets in
+                listViewModel.deleteLetters(atOffsets: offsets, pinned: true)
+            }
+        } header: {
+            Text("PINNED").font(.title2)
+        }
+    }
+}
+
+struct UnpinnedLettersSection: View {
+    var listViewModel: LetterListViewModel
+    
+    var body: some View {
+        Section {
+            ForEach(listViewModel.unpinnedLetters) { letter in
+                NavigationLink {
+                    LetterDetailView(
+                        listViewModel: listViewModel,
+                        detailViewModel: LetterDetailViewModel(letter: letter)
+                    )
+                } label: {
+                    LetterRow(letter: letter)
+                }
+                .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                    Button {
+                        listViewModel.togglePin(for: letter)
+                    } label: {
+                        Label("Pin", systemImage: "pin.fill")
+                    }
+                    .tint(.orange)
+                }
+            }
+            .onDelete { offsets in
+                listViewModel.deleteLetters(atOffsets: offsets, pinned: false)
+            }
+        } header: {
+            Text("OTHERS").font(.title2)
+        }
+    }
+}

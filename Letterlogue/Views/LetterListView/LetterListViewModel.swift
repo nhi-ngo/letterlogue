@@ -12,18 +12,28 @@ class LetterListViewModel {
     var letters: [Letter] = []
     var searchText: String = ""
     
-    var filteredLetters: [Letter] {
-        let sortedLetters = letters.sorted(by: { $0.timestamp > $1.timestamp })
-
+    private var searchedLetters: [Letter] {
         if searchText.isEmpty {
-            return sortedLetters
+            return letters
         } else {
-            return sortedLetters.filter { letter in
+            return letters.filter { letter in
                 let titleMatch =  letter.title.localizedCaseInsensitiveContains(searchText)
                 let contentMatch = letter.content.localizedCaseInsensitiveContains(searchText)
-               return titleMatch || contentMatch
+                return titleMatch || contentMatch
             }
         }
+    }
+    
+    var pinnedLetters: [Letter] {
+        return searchedLetters
+            .filter { $0.isPinned }
+            .sorted { $0.timestamp > $1.timestamp }
+    }
+    
+    var unpinnedLetters: [Letter] {
+        return searchedLetters
+            .filter { !$0.isPinned }
+            .sorted { $0.timestamp > $1.timestamp }
     }
     
     init() {
@@ -40,11 +50,15 @@ class LetterListViewModel {
         }
     }
     
-    func deleteLetter(atOffsets offsets: IndexSet) {
-        let idsToDelete = offsets.map { filteredLetters[$0].id }
-        
-        letters.removeAll { letterInOriginal in
-            idsToDelete.contains(letterInOriginal.id)
+    func deleteLetters(atOffsets offsets: IndexSet, pinned: Bool) {
+        let source = pinned ? pinnedLetters : unpinnedLetters
+        let idsToDelete = offsets.map { source[$0].id }
+        letters.removeAll { idsToDelete.contains($0.id) }
+    }
+    
+    func togglePin(for letter: Letter) {
+        if let index = letters.firstIndex(where: { $0.id == letter.id }) {
+            letters[index].isPinned.toggle()
         }
     }
 }
