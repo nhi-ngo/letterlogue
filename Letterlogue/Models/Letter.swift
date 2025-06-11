@@ -6,20 +6,25 @@
 //
 
 import Foundation
+import SwiftData
 
-struct Letter: Identifiable, Codable, Hashable {
-    var id = UUID()
-    var title: String = ""
+@Model
+class Letter {
+    var id: UUID
+    var title: String
     var content: String
-    var timestamp: Date = Date()
-    var isPinned: Bool = false
-}
-
-struct MockData {
-    static let letters = [
-        Letter(title: "Important Pinned Task", content: "Must do this today.", timestamp: Date(), isPinned: true),
-        Letter(title: "Welcome!", content: "This is your first letter in Letterlogue.", timestamp: Date().addingTimeInterval(-86400 * 2), isPinned: false),
-        Letter(title: "Another Pinned Item", content: "Milk, Bread, Eggs", timestamp: Date().addingTimeInterval(-86400), isPinned: true),
-        Letter(title: "Ideas for Project X", content: "Brainstorming session notes...", timestamp: Date(), isPinned: false)
-    ]
+    var timestamp: Date
+    var isPinned: Bool
+    
+    init(id: UUID = UUID(),
+         title: String = "",
+         content: String = "",
+         timestamp: Date = Date(),
+         isPinned: Bool = false) {
+        self.id = id
+        self.title = title
+        self.content = content
+        self.timestamp = timestamp
+        self.isPinned = isPinned
+    }
 }

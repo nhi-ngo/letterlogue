@@ -12,8 +12,11 @@ struct LetterRow: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(letter.title.isEmpty ? "Untitled" : letter.title).font(.headline)
-            Text(letter.timestamp, style: .date).font(.subheadline).foregroundColor(.gray)
+            Text(letter.title.isEmpty ? "Untitled" : letter.title)
+                .font(.headline)
+            Text(letter.timestamp, style: .date)
+                .font(.subheadline)
+                .foregroundColor(.gray)
             Text(letter.content)
                 .font(.caption)
                 .lineLimit(2)
@@ -23,5 +26,5 @@ struct LetterRow: View {
 }
 
 #Preview {
-    LetterRow(letter: MockData.letters[0])
+    LetterRow(letter: Letter())
 }
