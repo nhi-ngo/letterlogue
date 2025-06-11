@@ -8,39 +8,40 @@
 import SwiftUI
 import SwiftData
 
+extension Letter {
+    func matchesSearch(_ text: String) -> Bool {
+        text.isEmpty ||
+        title.localizedCaseInsensitiveContains(text) ||
+        content.localizedCaseInsensitiveContains(text)
+    }
+}
+
 struct LetterListView: View {
-    
     @Environment(\.modelContext) var modelContext
     
     @Query(sort: [SortDescriptor(\Letter.timestamp, order: .reverse)])
     var lettersFromDB: [Letter]
     
-    var sortedLetters: [Letter] {
-        lettersFromDB.sorted {
-            if $0.isPinned == $1.isPinned {
-                return $0.timestamp > $1.timestamp
-            }
-            return $0.isPinned && !$1.isPinned
-        }
-    }
-    
     @State private var searchText: String = ""
     @State private var path = NavigationPath()
     
+    var sortedLetters: [Letter] {
+        lettersFromDB
+            .filter { $0.matchesSearch(searchText) }
+            .sorted {
+                if $0.isPinned == $1.isPinned {
+                    return $0.timestamp > $1.timestamp
+                }
+                return $0.isPinned && !$1.isPinned
+            }
+    }
+    
     var pinnedLetters: [Letter] {
-        lettersFromDB.filter { letter in
-            letter.isPinned && (searchText.isEmpty ||
-                                letter.title.localizedCaseInsensitiveContains(searchText) ||
-                                letter.content.localizedCaseInsensitiveContains(searchText))
-        }
+        sortedLetters.filter {  $0.isPinned }
     }
     
     var unpinnedLetters: [Letter] {
-        lettersFromDB.filter { letter in
-            !letter.isPinned && (searchText.isEmpty ||
-                                 letter.title.localizedCaseInsensitiveContains(searchText) ||
-                                 letter.content.localizedCaseInsensitiveContains(searchText))
-        }
+        sortedLetters.filter {  !$0.isPinned }
     }
     
     var body: some View {
@@ -66,7 +67,7 @@ struct LetterListView: View {
                     }
                 }
                 
-                // OTHERS Section
+                // UNPINNED Section
                 if !unpinnedLetters.isEmpty {
                     Section("LETTERS") {
                         ForEach(unpinnedLetters) { letter in
@@ -88,8 +89,8 @@ struct LetterListView: View {
                 
                 // Empty state
                 let emptyStateText = searchText.isEmpty
-                    ? "No letters yet. Tap '+' to add one!"
-                    : "No letters match \"\(searchText)\""
+                ? "No letters yet. Tap '+' to add one!"
+                : "No letters match \"\(searchText)\""
                 
                 if pinnedLetters.isEmpty && unpinnedLetters.isEmpty {
                     Text(emptyStateText)
@@ -112,11 +113,6 @@ struct LetterListView: View {
             }
             .navigationDestination(for: Letter.self) { letter in
                 LetterDetailView(letter: letter)
-            }
-            .onAppear {
-                for letter in lettersFromDB {
-                    print("📨 \(letter.title) | \(letter.timestamp) | Pinned: \(letter.isPinned)")
-                }
             }
         }
     }
