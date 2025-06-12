@@ -30,7 +30,7 @@ struct LetterDetailView: View {
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [5]))
-                        .foregroundColor(Color.gray.opacity(0.5))
+                        .foregroundColor(.accentColor.opacity(0.5))
                 )
                 .focused($focusedField, equals: .title)
             
@@ -39,7 +39,8 @@ struct LetterDetailView: View {
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [5]))
-                        .foregroundColor(Color.gray.opacity(0.5))
+                        .foregroundColor(.accentColor.opacity(0.5))
+                    
                 )
                 .frame(maxHeight: .infinity)
                 .focused($focusedField, equals: .content)

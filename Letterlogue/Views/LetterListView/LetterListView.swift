@@ -93,7 +93,7 @@ struct LetterListView: View {
                 
                 // Empty state
                 let emptyStateText = searchText.isEmpty
-                ? "No letters yet. What’s waiting to be written?"
+                ? "No letters yet. Write today!"
                 : "No letters match \"\(searchText)\""
                 
                 if pinnedLetters.isEmpty && unpinnedLetters.isEmpty {
@@ -107,7 +107,7 @@ struct LetterListView: View {
             .navigationTitle("💌 All letters")
             .searchable(text: $searchText)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         addNewLetter()
                     } label: {

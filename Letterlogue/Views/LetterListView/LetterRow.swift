@@ -30,7 +30,7 @@ struct LetterRow: View {
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [5]))
-                .foregroundColor(.gray.opacity(0.5))
+                .foregroundColor(.accentColor.opacity(0.5))
         )
     }
 }
