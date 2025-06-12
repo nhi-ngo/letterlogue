@@ -49,7 +49,7 @@ struct LetterListView: View {
             List {
                 // PINNED Section
                 if !pinnedLetters.isEmpty {
-                    Section("PINNED") {
+                    Section("📌 PINNED") {
                         ForEach(pinnedLetters) { letter in
                             NavigationLink(value: letter) {
                                 LetterRow(letter: letter)
@@ -62,6 +62,8 @@ struct LetterListView: View {
                                 }
                                 .tint(.gray)
                             }
+                            .listRowInsets(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
+                            .listRowSeparator(.hidden)
                         }
                         .onDelete(perform: deletePinnedLetters)
                     }
@@ -69,7 +71,7 @@ struct LetterListView: View {
                 
                 // UNPINNED Section
                 if !unpinnedLetters.isEmpty {
-                    Section("LETTERS") {
+                    Section("📨 LETTERS") {
                         ForEach(unpinnedLetters) { letter in
                             NavigationLink(value: letter) {
                                 LetterRow(letter: letter )
@@ -82,6 +84,8 @@ struct LetterListView: View {
                                 }
                                 .tint(.orange)
                             }
+                            .listRowInsets(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
+                            .listRowSeparator(.hidden)
                         }
                         .onDelete(perform: deleteUnpinnedLetters)
                     }
@@ -89,7 +93,7 @@ struct LetterListView: View {
                 
                 // Empty state
                 let emptyStateText = searchText.isEmpty
-                ? "No letters yet. Tap '+' to add one!"
+                ? "No letters yet. What’s waiting to be written?"
                 : "No letters match \"\(searchText)\""
                 
                 if pinnedLetters.isEmpty && unpinnedLetters.isEmpty {
@@ -99,15 +103,17 @@ struct LetterListView: View {
                         .listRowSeparator(.hidden)
                 }
             }
-            .listStyle(.insetGrouped)
-            .navigationTitle("All letters")
+            .listStyle(.plain)
+            .navigationTitle("💌 All letters")
             .searchable(text: $searchText)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         addNewLetter()
                     } label: {
-                        Image(systemName: "plus.circle.fill")
+                        Image("icon-composing-letter")
+                            .resizable()
+                            .frame(width: 25, height: 25)
                     }
                 }
             }

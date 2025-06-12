@@ -23,13 +23,25 @@ struct LetterDetailView: View {
     
     var body: some View {
         VStack {
-            TextField("Title", text: $letter.title)
+            TextField("Title", text: $letter.title, axis: .vertical)
                 .font(.title2)
+                .lineLimit(1...5)
+                .padding(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [5]))
+                        .foregroundColor(Color.gray.opacity(0.5))
+                )
                 .focused($focusedField, equals: .title)
             
             TextEditor(text: $letter.content)
+                .padding(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [5]))
+                        .foregroundColor(Color.gray.opacity(0.5))
+                )
                 .frame(maxHeight: .infinity)
-                .border(Color.gray.opacity(0.2), width: 1)
                 .focused($focusedField, equals: .content)
         }
         .padding()
