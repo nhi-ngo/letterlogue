@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+    <device id="retina6_9" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="EHf-IW-A2E">
+            <objects>
+                <viewController id="01J-lp-oVM" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleAspectFit" id="Zt7-UT-cR6">
+                        <rect key="frame" x="0.0" y="0.0" width="455" height="924"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="UPW-bP-n4m">
+                                <rect key="frame" x="97" y="341" width="262" height="242"/>
+                            </imageView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="XNJ-5h-dCd"/>
+                        <color key="backgroundColor" red="0.59479618069999995" green="0.76718431710000001" blue="0.83052963020000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="UPW-bP-n4m" firstAttribute="leading" secondItem="XNJ-5h-dCd" secondAttribute="leading" constant="97" id="FqS-BF-Fhi"/>
+                            <constraint firstItem="XNJ-5h-dCd" firstAttribute="trailing" secondItem="UPW-bP-n4m" secondAttribute="trailing" constant="96" id="Ouo-rb-RuB"/>
+                            <constraint firstItem="UPW-bP-n4m" firstAttribute="centerY" secondItem="Zt7-UT-cR6" secondAttribute="centerY" id="SNy-uO-2dS"/>
+                            <constraint firstItem="UPW-bP-n4m" firstAttribute="top" secondItem="XNJ-5h-dCd" secondAttribute="top" constant="217" id="b1a-8U-06C"/>
+                        </constraints>
+                    </view>
+                    <size key="freeformSize" width="455" height="924"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-104.31818181818183" y="401.67364016736406"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="logo" width="1024" height="1024"/>
+    </resources>
+</document>
