@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct LetterlogueApp: App {
@@ -13,5 +14,6 @@ struct LetterlogueApp: App {
         WindowGroup {
             LetterListView()
         }
+        .modelContainer(for: Letter.self)
     }
 }

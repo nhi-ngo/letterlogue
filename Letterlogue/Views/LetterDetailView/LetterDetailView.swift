@@ -6,27 +6,43 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct LetterDetailView: View {
+    
+    @Bindable var letter: Letter
+    
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    
     private enum Field: Hashable {
         case title
         case content
     }
-    
-    var listViewModel: LetterListViewModel
-    @State var detailViewModel = LetterDetailViewModel()
-    
     @FocusState private var focusedField: Field?
     
     var body: some View {
         VStack {
-            TextField("Title", text: $detailViewModel.title)
+            TextField("Title", text: $letter.title, axis: .vertical)
                 .font(.title2)
+                .lineLimit(1...5)
+                .padding(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [5]))
+                        .foregroundColor(.accentColor.opacity(0.5))
+                )
                 .focused($focusedField, equals: .title)
             
-            TextEditor(text: $detailViewModel.content)
+            TextEditor(text: $letter.content)
+                .padding(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [5]))
+                        .foregroundColor(.accentColor.opacity(0.5))
+                    
+                )
                 .frame(maxHeight: .infinity)
-                .border(Color.gray.opacity(0.2), width: 1)
                 .focused($focusedField, equals: .content)
         }
         .padding()
@@ -38,33 +54,18 @@ struct LetterDetailView: View {
             }
         }
         .onDisappear {
-            if detailViewModel.isNew {
-                if !detailViewModel.title.isEmpty || !detailViewModel.content.isEmpty {
-                    let letterToSave = detailViewModel.saveLetter()
-                    listViewModel.addLetter(letterToSave)
-                }
+            let hasContent = !letter.title.isEmpty || !letter.content.isEmpty
+            if hasContent {
+                modelContext.insert(letter)
             } else {
-                if detailViewModel.hasChanges {
-                    let letterToSave = detailViewModel.saveLetter()
-                    listViewModel.updateLetter(letterToSave)
-                }
+                modelContext.delete(letter)
             }
         }
     }
 }
 
-#Preview("Add Letter") {
+#Preview {
     NavigationStack {
-        LetterDetailView(
-            listViewModel: LetterListViewModel(),
-            detailViewModel: LetterDetailViewModel())
-    }
-}
-
-#Preview("Edit Letter") {
-    NavigationStack {
-        LetterDetailView(
-            listViewModel: LetterListViewModel(),
-            detailViewModel: LetterDetailViewModel(letter: MockData.letters[0]))
+        LetterDetailView(letter: Letter(title: "Preview Title", content: "Preview content.", isPinned: false))
     }
 }

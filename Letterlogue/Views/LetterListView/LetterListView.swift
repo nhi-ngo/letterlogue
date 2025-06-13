@@ -6,112 +6,145 @@
 //
 
 import SwiftUI
+import SwiftData
+
+extension Letter {
+    func matchesSearch(_ text: String) -> Bool {
+        text.isEmpty ||
+        title.localizedCaseInsensitiveContains(text) ||
+        content.localizedCaseInsensitiveContains(text)
+    }
+}
 
 struct LetterListView: View {
+    @Environment(\.modelContext) var modelContext
     
-    @State var listViewModel = LetterListViewModel()
+    @Query(sort: [SortDescriptor(\Letter.timestamp, order: .reverse)])
+    var lettersFromDB: [Letter]
+    
+    @State private var searchText: String = ""
+    @State private var path = NavigationPath()
+    
+    var sortedLetters: [Letter] {
+        lettersFromDB
+            .filter { $0.matchesSearch(searchText) }
+            .sorted {
+                if $0.isPinned == $1.isPinned {
+                    return $0.timestamp > $1.timestamp
+                }
+                return $0.isPinned && !$1.isPinned
+            }
+    }
+    
+    var pinnedLetters: [Letter] {
+        sortedLetters.filter {  $0.isPinned }
+    }
+    
+    var unpinnedLetters: [Letter] {
+        sortedLetters.filter {  !$0.isPinned }
+    }
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
-                if !listViewModel.pinnedLetters.isEmpty {
-                    PinnedLettersSection(listViewModel: listViewModel)
+                // PINNED Section
+                if !pinnedLetters.isEmpty {
+                    Section("📌 PINNED") {
+                        ForEach(pinnedLetters) { letter in
+                            NavigationLink(value: letter) {
+                                LetterRow(letter: letter)
+                            }
+                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                Button {
+                                    letter.isPinned.toggle()
+                                } label: {
+                                    Label("Unpin", systemImage: "pin.slash.fill")
+                                }
+                                .tint(.gray)
+                            }
+                            .listRowInsets(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
+                            .listRowSeparator(.hidden)
+                        }
+                        .onDelete(perform: deletePinnedLetters)
+                    }
                 }
                 
-                if !listViewModel.unpinnedLetters.isEmpty {
-                    UnpinnedLettersSection(listViewModel: listViewModel)
+                // UNPINNED Section
+                if !unpinnedLetters.isEmpty {
+                    Section("📨 LETTERS") {
+                        ForEach(unpinnedLetters) { letter in
+                            NavigationLink(value: letter) {
+                                LetterRow(letter: letter )
+                            }
+                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                Button {
+                                    letter.isPinned.toggle()
+                                } label: {
+                                    Label("Pin", systemImage: "pin.fill")
+                                }
+                                .tint(.orange)
+                            }
+                            .listRowInsets(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
+                            .listRowSeparator(.hidden)
+                        }
+                        .onDelete(perform: deleteUnpinnedLetters)
+                    }
                 }
                 
-                if listViewModel.pinnedLetters.isEmpty && listViewModel.unpinnedLetters.isEmpty {
-                    Text("No letters yet. Tap '+' to create one!")
+                // Empty state
+                let emptyStateText = searchText.isEmpty
+                ? "No letters yet. Write today!"
+                : "No letters match \"\(searchText)\""
+                
+                if pinnedLetters.isEmpty && unpinnedLetters.isEmpty {
+                    Text(emptyStateText)
                         .foregroundColor(.gray)
-                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .listRowSeparator(.hidden)
                 }
             }
-            .listStyle(.insetGrouped)
-            .navigationTitle("All letters")
-            .searchable(text: $listViewModel.searchText)
+            .listStyle(.plain)
+            .navigationTitle("💌 All letters")
+            .searchable(text: $searchText)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink {
-                        LetterDetailView(
-                            listViewModel: listViewModel,
-                            detailViewModel: LetterDetailViewModel()
-                        )
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        addNewLetter()
                     } label: {
-                        Image(systemName: "plus.circle.fill")
+                        Image("icon-composing-letter")
+                            .resizable()
+                            .frame(width: 25, height: 25)
                     }
                 }
             }
+            .navigationDestination(for: Letter.self) { letter in
+                LetterDetailView(letter: letter)
+            }
         }
+    }
+    
+    // --- Action Methods ---
+    private func addNewLetter() {
+        let newLetter = Letter(title: "", content: "")
+        path.append(newLetter)
+    }
+    
+    private func delete(letters: [Letter], atOffsets offsets: IndexSet) {
+        for index in offsets {
+            let letterToDelete = letters[index]
+            modelContext.delete(letterToDelete)
+        }
+    }
+    
+    private func deletePinnedLetters(atOffsets offsets: IndexSet) {
+        delete(letters: pinnedLetters, atOffsets: offsets)
+    }
+    
+    private func deleteUnpinnedLetters(atOffsets offsets: IndexSet) {
+        delete(letters: unpinnedLetters, atOffsets: offsets)
     }
 }
 
 #Preview {
     LetterListView()
-}
-
-
-struct PinnedLettersSection: View {
-    var listViewModel: LetterListViewModel
-    
-    var body: some View {
-        Section {
-            ForEach(listViewModel.pinnedLetters) { letter in
-                NavigationLink {
-                    LetterDetailView(
-                        listViewModel: listViewModel,
-                        detailViewModel: LetterDetailViewModel(letter: letter)
-                    )
-                } label: {
-                    LetterRow(letter: letter)
-                }
-                .swipeActions(edge: .leading, allowsFullSwipe: false) {
-                    Button {
-                        listViewModel.togglePin(for: letter)
-                    } label: {
-                        Label("Unpin", systemImage: "pin.slash.fill")
-                    }
-                    .tint(.gray)
-                }
-            }
-            .onDelete { offsets in
-                listViewModel.deleteLetters(atOffsets: offsets, pinned: true)
-            }
-        } header: {
-            Text("PINNED").font(.title2)
-        }
-    }
-}
-
-struct UnpinnedLettersSection: View {
-    var listViewModel: LetterListViewModel
-    
-    var body: some View {
-        Section {
-            ForEach(listViewModel.unpinnedLetters) { letter in
-                NavigationLink {
-                    LetterDetailView(
-                        listViewModel: listViewModel,
-                        detailViewModel: LetterDetailViewModel(letter: letter)
-                    )
-                } label: {
-                    LetterRow(letter: letter)
-                }
-                .swipeActions(edge: .leading, allowsFullSwipe: false) {
-                    Button {
-                        listViewModel.togglePin(for: letter)
-                    } label: {
-                        Label("Pin", systemImage: "pin.fill")
-                    }
-                    .tint(.orange)
-                }
-            }
-            .onDelete { offsets in
-                listViewModel.deleteLetters(atOffsets: offsets, pinned: false)
-            }
-        } header: {
-            Text("OTHERS").font(.title2)
-        }
-    }
 }
