@@ -105,7 +105,7 @@ struct LetterListView: View {
                         .listRowSeparator(.hidden)
                 }
             }
-            .accessibilityIdentifier("letterList")
+            .accessibilityIdentifier("letterTable")
             .listStyle(.plain)
             .navigationTitle("💌 All letters")
             .searchable(text: $searchText)
