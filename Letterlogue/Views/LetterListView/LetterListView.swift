@@ -54,6 +54,7 @@ struct LetterListView: View {
                             NavigationLink(value: letter) {
                                 LetterRow(letter: letter)
                             }
+                            .accessibilityIdentifier("letterRow_\(letter.id)")
                             .swipeActions(edge: .leading, allowsFullSwipe: false) {
                                 Button {
                                     letter.isPinned.toggle()
@@ -76,6 +77,7 @@ struct LetterListView: View {
                             NavigationLink(value: letter) {
                                 LetterRow(letter: letter )
                             }
+                            .accessibilityIdentifier("letterRow_\(letter.id)")
                             .swipeActions(edge: .leading, allowsFullSwipe: false) {
                                 Button {
                                     letter.isPinned.toggle()
@@ -103,6 +105,7 @@ struct LetterListView: View {
                         .listRowSeparator(.hidden)
                 }
             }
+            .accessibilityIdentifier("letterList")
             .listStyle(.plain)
             .navigationTitle("💌 All letters")
             .searchable(text: $searchText)
@@ -115,6 +118,7 @@ struct LetterListView: View {
                             .resizable()
                             .frame(width: 25, height: 25)
                     }
+                    .accessibilityIdentifier("addLetterButton")
                 }
             }
             .navigationDestination(for: Letter.self) { letter in

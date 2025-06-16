@@ -33,6 +33,7 @@ struct LetterDetailView: View {
                         .foregroundColor(.accentColor.opacity(0.5))
                 )
                 .focused($focusedField, equals: .title)
+                .accessibilityIdentifier("titleField")
             
             TextEditor(text: $letter.content)
                 .padding(10)
@@ -44,6 +45,7 @@ struct LetterDetailView: View {
                 )
                 .frame(maxHeight: .infinity)
                 .focused($focusedField, equals: .content)
+                .accessibilityIdentifier("contentEditor")
         }
         .padding()
         .toolbar {
@@ -51,6 +53,7 @@ struct LetterDetailView: View {
                 Button("Done") {
                     focusedField = nil
                 }
+                .accessibilityIdentifier("doneButton")
             }
         }
         .onDisappear {
